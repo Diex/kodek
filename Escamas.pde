@@ -5,7 +5,7 @@ class Escamas {
   PVector vel = new PVector();
 
   float largo = 10;
-  float maxLargo = 200;
+  float maxLargo = 100;
   float alpha = 1;
   float minAlpha = 30;
   float maxAlpha = 100;
@@ -20,35 +20,34 @@ class Escamas {
   float pAvg = 0.0;
   float thAvg = 1000;
 
-  // esto es para poner una referencia para el loop en el sentido Z basicamente
-  PVector origin = new PVector();
+  // esto es para poner una referencia para el loop en el sentido Z basicament
+  //PVector origin = new PVector();
   float zmax = 300;
   float zmin = -600;
 
   SoundFile sf;
-  
+
   Escamas(String name, SoundFile sf) {
     this.name = name;
-    origin.set(width/2, height/2, -3000);
-    pos.set(random(-width/width), random(-height/height), -1000);
+    //origin.set(width/2, height/2, 0);
+    pos.set(random(-width/width), random(-height/height), 0);
     reset(0);
     this.sf = sf;
-    
   }
-  
+
   int cc = 0;
-   
-  void reset(int currentColor){    
+
+  void reset(int currentColor) {    
     cc = currentColor;
-    pos.set(random(width), random(height), random(zmin, zmax));    
+    pos.set(random(width), random(height), random(zmin, zmax));
   }
 
   void update() {    
-    setVelocity();    
+    setVelocity();  
+    //vel.z = 0;  // engnia pichanga
     pos.add(vel); 
-    //println(name, pos, vel);
-    println(name, pAvg);
-    
+  pos.z = 0;
+    println(name, pAvg, pos, vel);
   }
 
   void dibujar() {
@@ -64,7 +63,7 @@ class Escamas {
     noFill();
     strokeWeight(0.5);
     stroke(cc, alpha);
-    
+
     // base de la piramide
     // sacado de aca: https://www.youtube.com/watch?v=4HP49caCuWY
     PVector a = new PVector(0, 0, 0); 
@@ -115,7 +114,7 @@ class Escamas {
     return current * (1 - factor) + prev * factor;
   }
 
-  
+
   void setVelocity() {
     // para calcular la velocidad en función de la orientación del sensor
     // hay que obtener el vector "forward" del quaternion
@@ -131,20 +130,36 @@ class Escamas {
   }
 
   void limites() {
-    if (screenX(pos.x, pos.y, pos.z) < 0 || screenX(pos.x, pos.y, pos.z) > width) {
-      pos.x = pos.x * -1;
-    };
 
-    if (screenY(pos.x, pos.y, pos.z) < 0 || screenY(pos.x, pos.y, pos.z) > height) {
-      pos.y = pos.y * -1;
-    };
-
-    if (pos.z < origin.z - zmax) {
-      pos.z = origin.z + zmax;
+    if (pos.x < 0) {
+      pos.x = width+10;
     }
-    if (pos.z > zmax) {
-      pos.z = origin.z - zmax;
+
+    if ( pos.x > width) {
+      pos.x = -10;
     };
+
+    if (pos.y < 0) {
+      pos.y = height+10;
+    }
+    if ( pos.y > height) {
+      pos.y = 0-10;
+    };
+    //if (screenX(pos.x, pos.y, pos.z) < 0 || screenX(pos.x, pos.y, pos.z) > width) {
+    //  pos.x = pos.x * -1;      
+    //};
+
+    //if (screenY(pos.x, pos.y, pos.z) < 0 || screenY(pos.x, pos.y, pos.z) > height) {
+    //  pos.y = pos.y * -1;
+
+    //};
+
+    //if (pos.z < origin.z - zmax) {
+    //  pos.z = origin.z + zmax;
+    //}
+    //if (pos.z > zmax) {
+    //  pos.z = origin.z - zmax;
+    //};
   }
 
 
@@ -160,16 +175,15 @@ class Escamas {
     float dAvg = pAvg - abs(avgAcc);
 
     pAvg = ease(avgAcc, pAvg, dAvg >= 0 ? 0.996 : 0.2);
-    
+
     soundTrigger(pAvg);
-    
   }
 
 
-  void soundTrigger(float pAvg){
-    if(pAvg < thAvg) return;
-    
-    if(!sf.isPlaying()){
+  void soundTrigger(float pAvg) {
+    if (pAvg < thAvg) return;
+
+    if (!sf.isPlaying()) {
       sf.play();
       println(sf.percent());
     }

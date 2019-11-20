@@ -33,15 +33,15 @@ String rand = "";
 
 
 void setup() {
-  size(1280, 800, P3D);
+  size(1920, 1080, P3D);
   //fullScreen(P3D);
-  
+
 
   backgrounds[0] = new SoundFile(this, "back 1.wav");
   backgrounds[1] = new SoundFile(this, "back 2.wav");
   backgrounds[2] = new SoundFile(this, "back 3.wav");
 
-  
+
   escamas1 = new Escamas("k1", new SoundFile(this, "action 4.wav"));
   escamas2 = new Escamas("k2", new SoundFile(this, "action 3.wav"));
   escamas3 = new Escamas("k3", new SoundFile(this, "action 2.wav"));
@@ -65,15 +65,16 @@ void setup() {
   oscP5.plug(escamas1, "imu", "/k1/imuquat");
   oscP5.plug(escamas1, "realacc", "/k1/realacc");
 
-  
+
 
 
   reset();
-  
+
   timeout = new TimeoutThread(this, "doReset", (int) (resetTimer * 60E3), true);
+  noCursor();
 }
 
-public void doReset(){
+public void doReset() {
   canReset = true;
 }
 
@@ -81,10 +82,10 @@ int colorPallet = 0;
 
 color colorPallets[][] = {
   {#ffdfdf, #fbc1bc, #315b96, #233567, #3c4245}, 
-  {#4baea0, #b6e6bd, #f1f0cf, #f0c9c9, #d2fafb},
-  {#202040, #202060, #602080, #b030b0, #ecfcff},
-  {#eafbea, #6f9a8d, #1f6650, #ea5e5e, #ffdc34},
-  {#ffe7d1, #f6c89f, #4b8e8d, #396362, #c2e8ce},
+  {#4baea0, #b6e6bd, #f1f0cf, #f0c9c9, #d2fafb}, 
+  {#202040, #202060, #602080, #b030b0, #ecfcff}, 
+  {#eafbea, #6f9a8d, #1f6650, #ea5e5e, #ffdc34}, 
+  {#ffe7d1, #f6c89f, #4b8e8d, #396362, #c2e8ce}, 
   {#ffd369, #e26241, #940a37, #5b0909, #9d0b0b}
 };
 
@@ -92,15 +93,15 @@ color colorPallets[][] = {
 
 public void reset() {
 
-  for(int bg = 0; bg < backgrounds.length; bg++){
+  for (int bg = 0; bg < backgrounds.length; bg++) {
     backgrounds[bg].stop();
   }
-  
+
   int newbg = (int) random(backgrounds.length);  
   backgrounds[newbg].loop();
   backgrounds[newbg].amp(0.6);
-  
-  
+
+
 
   colorPallet = (int) random(colorPallets.length);
 
@@ -112,12 +113,12 @@ public void reset() {
 
   rand = "";
   frameNumber = 0;
-  
+
   for (int i = 0; i < 8; i++) {
     rand += (char) random(97, 122);
   }
-  
-  
+
+
   background(colorPallets[this.colorPallet][4]);
 }
 
@@ -144,14 +145,14 @@ void plotAngle() {
 int frameNumber = 0;
 
 void draw() {
-  
-  if(canReset){
+
+  if (canReset) {
     reset();
     canReset = false;
   }
-  
+
   pushMatrix();
-  translate(width/2, height/2);
+  // translate(width/2, height/2);
   fill(0);
 
 
@@ -172,11 +173,11 @@ void draw() {
   noStroke();
   //fill(255,1);
   //rect(-10,-10, width+10, height+10);
-  
-  if(frameCount % 60 == 0) {    
-    saveFrame("./images/" + rand + "/" + frameNumber + ".jpg");
-    frameNumber++;
-  }
+
+  //  if(frameCount % 60 == 0) {    
+  //  saveFrame("./images/" + rand + "/" + frameNumber + ".jpg");
+  //frameNumber++;
+  // }
 }
 
 void keyPressed()
