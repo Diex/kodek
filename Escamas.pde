@@ -6,9 +6,10 @@ class Escamas {
 
   float largo = 10;
   float maxLargo = 100;
+
   float alpha = 1;
   float minAlpha = 30;
-  float maxAlpha = 100;
+  float maxAlpha = 200;
   float maxSpeed = 3;
 
   // data del sensor
@@ -22,15 +23,17 @@ class Escamas {
 
   // esto es para poner una referencia para el loop en el sentido Z basicament
   //PVector origin = new PVector();
-  float zmax = 300;
-  float zmin = -600;
-
+  //float zmax = 300;
+  //float zmin = -600;
+  
+  
   SoundFile sf;
 
   Escamas(String name, SoundFile sf) {
     this.name = name;
     //origin.set(width/2, height/2, 0);
     pos.set(random(-width/width), random(-height/height), 0);
+    vel.set(PVector.random3D());
     reset(0);
     this.sf = sf;
   }
@@ -39,22 +42,24 @@ class Escamas {
 
   void reset(int currentColor) {    
     cc = currentColor;
-    pos.set(random(width), random(height), random(zmin, zmax));
+    //pos.set(random(width), random(height), random(zmin, zmax));
+    pos.set(random(width), random(height), 0);
   }
 
   void update() {    
     setVelocity();  
     //vel.z = 0;  // engnia pichanga
     pos.add(vel); 
-  pos.z = 0;
-    println(name, pAvg, pos, vel);
+    pos.z = 0;
+    println(name, pAvg, pRotInertia, pos, vel);
   }
 
   void dibujar() {
 
     limites();
 
-    largo = constrain( map(abs(pAvg), 0, maxAcc, 0, maxLargo), maxLargo/10, maxLargo);
+    //largo = constrain( map(abs(pAvg), 0, maxAcc, 0, maxLargo), maxLargo/10, maxLargo);
+    largo = constrain( map(pRotInertia, 0,PI, 0, maxLargo), maxLargo/10, maxLargo);
     alpha = constrain( map(abs(pAvg), 0, maxAcc, 0, maxAlpha), minAlpha, maxAlpha);
 
     pushMatrix();
@@ -97,9 +102,12 @@ class Escamas {
     popMatrix();
   }
 
+
   void applyRot() {
     float[] axis = orientation.toAxisAngle();
     rotate(-axis[0], -axis[1], -axis[3], axis[2]);
+    
+    
   }
 
   void lineFromPoints(PVector aPoint, PVector anotherPoint) {    
@@ -115,6 +123,11 @@ class Escamas {
   }
 
 
+  float pAngle = 0;
+  float pRotInertia = 3;
+  
+  Quaternion pOrientation = new Quaternion();
+  
   void setVelocity() {
     // para calcular la velocidad en función de la orientación del sensor
     // hay que obtener el vector "forward" del quaternion
@@ -127,24 +140,39 @@ class Escamas {
     r.z = 1 - 2 * (-axis[1] * -axis[1] + (-axis[3]*-axis[3]));
     r.normalize().mult(maxSpeed);
     vel.set(r);
+    
+    
+    
+    // delta alpha
+    pOrientation.interpolateTo(orientation, 0.999);
+    pRotInertia = abs(pOrientation.toAxisAngle()[0]);
+    
+    pOrientation = orientation.copy();
+    
+    
   }
 
+
+  int limitTh = 20;
+  
   void limites() {
 
-    if (pos.x < 0) {
-      pos.x = width+10;
+    if (pos.x < -limitTh) {
+      pos.x = width+limitTh-1;
     }
 
-    if ( pos.x > width) {
-      pos.x = -10;
+    if ( pos.x >= width+limitTh) {
+      pos.x = -limitTh+1;
     };
 
-    if (pos.y < 0) {
-      pos.y = height+10;
+    if (pos.y < -limitTh) {
+      pos.y = height+limitTh-1;
     }
-    if ( pos.y > height) {
-      pos.y = 0-10;
+    if ( pos.y >= height+limitTh) {
+      pos.y = -limitTh+1;
     };
+    
+    
     //if (screenX(pos.x, pos.y, pos.z) < 0 || screenX(pos.x, pos.y, pos.z) > width) {
     //  pos.x = pos.x * -1;      
     //};
@@ -189,8 +217,12 @@ class Escamas {
     }
   }
 
+  
+  
   public void imu(float quant_w, float quant_x, float quant_y, float quant_z) {
     orientation.set(quant_w, quant_x, quant_y, quant_z);
+    
+    
   }
 
 

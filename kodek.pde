@@ -33,7 +33,8 @@ String rand = "";
 
 
 void setup() {
-  size(1920, 1080, P3D);
+  //size(1920, 1080, P3D);
+  size(1280, 800, P3D);
   //fullScreen(P3D);
 
 
