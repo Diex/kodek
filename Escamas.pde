@@ -8,9 +8,9 @@ class Escamas {
   float maxLargo = 100;
 
   float alpha = 1;
-  float minAlpha = 30;
-  float maxAlpha = 200;
-  float maxSpeed = 3;
+  float minAlpha = 10;
+  float maxAlpha = 150;
+  float maxSpeed = 1.5;
 
   // data del sensor
   String name; // me permite saber con que sensor estoy siendo controlada
@@ -28,7 +28,8 @@ class Escamas {
   
   
   SoundFile sf;
-
+  
+  int seed = 0;
   Escamas(String name, SoundFile sf) {
     this.name = name;
     //origin.set(width/2, height/2, 0);
@@ -36,6 +37,7 @@ class Escamas {
     vel.set(PVector.random3D());
     reset(0);
     this.sf = sf;
+    seed = (int)  random(1000);
   }
 
   int cc = 0;
@@ -58,7 +60,7 @@ class Escamas {
 
     limites();
 
-    //largo = constrain( map(abs(pAvg), 0, maxAcc, 0, maxLargo), maxLargo/10, maxLargo);
+    
     largo = constrain( map(pRotInertia, 0,PI, 0, maxLargo), maxLargo/10, maxLargo);
     alpha = constrain( map(abs(pAvg), 0, maxAcc, 0, maxAlpha), minAlpha, maxAlpha);
 
@@ -138,17 +140,15 @@ class Escamas {
     r.x = 2 * ((-axis[1] * axis[2]) + (-axis[0] * -axis[3]));
     r.y = 2 * ((-axis[3] * axis[2]) - (-axis[0] * -axis[1]));
     r.z = 1 - 2 * (-axis[1] * -axis[1] + (-axis[3]*-axis[3]));
-    r.normalize().mult(maxSpeed);
+    r.normalize().mult(noise(frameCount * 0.1, seed) * maxSpeed);
     vel.set(r);
     
     
     
     // delta alpha
     pOrientation.interpolateTo(orientation, 0.999);
-    pRotInertia = abs(pOrientation.toAxisAngle()[0]);
-    
+    pRotInertia = pOrientation.toAxisAngle()[0];    
     pOrientation = orientation.copy();
-    
     
   }
 
@@ -202,7 +202,7 @@ class Escamas {
     float avgAcc = (dx + dy + dz) / 3;
     float dAvg = pAvg - abs(avgAcc);
 
-    pAvg = ease(avgAcc, pAvg, dAvg >= 0 ? 0.996 : 0.2);
+    pAvg = ease(avgAcc, pAvg, dAvg >= 0 ? 0.995 : 0.1);
 
     soundTrigger(pAvg);
   }
