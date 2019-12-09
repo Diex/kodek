@@ -33,8 +33,8 @@ String rand = "";
 
 
 void setup() {
-  //size(1920, 1080, P3D);
-  size(1280, 800, P3D);
+   size(1920, 1080, P3D);
+ // size(1280, 800, P3D);
   //fullScreen(P3D);
 
 
@@ -93,8 +93,7 @@ color colorPallets[][] = {
 
 
 public void reset() {
-
-  for (int bg = 0; bg < backgrounds.length; bg++) {
+ for (int bg = 0; bg < backgrounds.length; bg++) {
     backgrounds[bg].stop();
   }
 
@@ -119,7 +118,8 @@ public void reset() {
     rand += (char) random(97, 122);
   }
 
-
+ saveFrame("./images/" + rand + ".jpg");
+ 
   background(colorPallets[this.colorPallet][4]);
 }
 
